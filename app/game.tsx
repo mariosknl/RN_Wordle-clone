@@ -7,7 +7,7 @@ import { StyleSheet, Text, useColorScheme, View } from "react-native";
 import { allWords } from "@/utils/allWords";
 import { words } from "@/utils/targetWords";
 
-const ROWS = 6;
+const ROWS = 3;
 
 const Page = () => {
 	const colorScheme = useColorScheme();
@@ -97,10 +97,16 @@ const Page = () => {
 
 		setTimeout(() => {
 			if (currentWord === word) {
-				// TODO: show end screen
 				console.log("word found");
+				// TODO: show end screen
+				router.push(
+					`/end?win=true&word=${word}&gameField=${JSON.stringify(rows)}`
+				);
 			} else if (curRow + 1 >= rows.length) {
 				console.log("game over");
+				router.push(
+					`/end?win=false&word=${word}&gameField=${JSON.stringify(rows)}`
+				);
 			}
 		}, 0);
 
