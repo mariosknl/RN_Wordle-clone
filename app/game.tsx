@@ -2,8 +2,10 @@ import OnScreenKeyboard from "@/components/OnScreenKeyboard";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { StyleSheet, Text, useColorScheme, View } from "react-native";
+import { allWords } from "@/utils/allWords";
+import { words } from "@/utils/targetWords";
 
 const ROWS = 6;
 
@@ -18,14 +20,115 @@ const Page = () => {
 		new Array(ROWS).fill(new Array(5).fill(""))
 	);
 	const [curRow, setCurRow] = useState(0);
-	const [curCol, setCurCol] = useState(0);
+	const [curCol, _setCurCol] = useState(0);
 
 	const [greenLetters, setGreenLetters] = useState<string[]>([]);
 	const [yellowLetters, setYellowLetters] = useState<string[]>([]);
 	const [grayLetters, setGrayLetters] = useState<string[]>([]);
 
+	// const [word, setWord] = useState<string>(
+	// 	words[Math.floor(Math.random() * words.length)]
+	// );
+
+	const [word, setWord] = useState("simon");
+	const wordLetters = word.split("");
+
+	const colStateRef = useRef(curCol);
+	const setCurCol = (col: number) => {
+		colStateRef.current = col;
+		_setCurCol(col);
+	};
+
 	const addKey = (key: string) => {
-		console.log("add key", key);
+		console.log("addKey", key);
+		const newRows = [...rows.map((row) => [...row])];
+
+		if (key === "ENTER") {
+			checkWord();
+		} else if (key === "BACKSPACE") {
+			if (colStateRef.current === 0) {
+				newRows[curRow][0] = "";
+				setRows(newRows);
+				return;
+			}
+			newRows[curRow][colStateRef.current - 1] = "";
+
+			setCurCol(colStateRef.current - 1);
+			setRows(newRows);
+			return;
+		} else if (colStateRef.current >= newRows[curRow].length) {
+			// End of Line, don't add key!
+			return;
+		} else {
+			newRows[curRow][colStateRef.current] = key;
+			setRows(newRows);
+			setCurCol(colStateRef.current + 1);
+		}
+	};
+
+	const checkWord = () => {
+		const currentWord = rows[curRow].join("");
+
+		if (currentWord.length < word.length) {
+			return;
+		}
+
+		if (!allWords.includes(currentWord)) {
+			console.log("not a word");
+		}
+
+		const newGreen: string[] = [];
+		const newYellow: string[] = [];
+		const newGray: string[] = [];
+
+		currentWord.split("").forEach((letter, index) => {
+			if (letter === wordLetters[index]) {
+				newGreen.push(letter);
+			} else if (wordLetters.includes(letter)) {
+				newYellow.push(letter);
+			} else {
+				newGray.push(letter);
+			}
+		});
+
+		setGreenLetters([...greenLetters, ...newGreen]);
+		setYellowLetters([...yellowLetters, ...newYellow]);
+		setGrayLetters([...grayLetters, ...newGray]);
+
+		setTimeout(() => {
+			if (currentWord === word) {
+				// TODO: show end screen
+				console.log("word found");
+			} else if (curRow + 1 >= rows.length) {
+				console.log("game over");
+			}
+		}, 0);
+
+		setCurRow(curRow + 1);
+		setCurCol(0);
+	};
+
+	const getCellColor = (cell: string, rowIndex: number, cellIndex: number) => {
+		if (curRow > rowIndex) {
+			if (wordLetters[cellIndex] === cell) {
+				return Colors.light.green;
+			} else if (wordLetters.includes(cell)) {
+				return Colors.light.yellow;
+			} else return grayColor;
+		}
+		return "transparent";
+	};
+
+	const getBorderColor = (
+		cell: string,
+		rowIndex: number,
+		cellIndex: number
+	) => {
+		if (curRow > rowIndex && cell !== "") {
+			return getCellColor(cell, rowIndex, cellIndex);
+		}
+
+		return Colors.light.gray;
 	};
 
 	return (
@@ -50,8 +153,22 @@ const Page = () => {
 				{rows.map((row, i) => (
 					<View key={`row-${i}`} style={styles.gameFieldRow}>
 						{row.map((cell, j) => (
-							<View key={`row-${i}-${j}}`} style={styles.cell}>
-								<Text style={[styles.cellText, { color: textColor }]}>
+							<View
+								key={`row-${i}-${j}}`}
+								style={[
+									styles.cell,
+									{
+										backgroundColor: getCellColor(cell, i, j),
+										borderColor: getBorderColor(cell, i, j),
+									},
+								]}
+							>
+								<Text
+									style={[
+										styles.cellText,
+										{ color: curRow > i ? "#fff" : textColor },
+									]}
+								>
 									{cell}
 								</Text>
 							</View>

@@ -45,16 +45,13 @@ const OnScreenKeyboard = ({
 				<View key={`row-${i}`} style={styles.row}>
 					{row.map((key, j) => (
 						<Pressable
-							key={`key-${i}-${j}`}
 							onPress={() => onKeyPressed(key)}
+							key={`key-${key}`}
 							style={({ pressed }) => [
 								styles.key,
-								{
-									width: keyWidth,
-									height: keyHeight,
-									backgroundColor: "#ddd",
-								},
+								{ width: keyWidth, height: keyHeight, backgroundColor: "#ddd" },
 								isSpecialKey(key) && { width: keyWidth * 1.5 },
+								pressed && { backgroundColor: "#868686" },
 								{
 									backgroundColor: greenLetters.includes(key)
 										? Colors.light.green
@@ -64,7 +61,6 @@ const OnScreenKeyboard = ({
 										? Colors.light.gray
 										: "#ddd",
 								},
-								pressed && { backgroundColor: "#868686" },
 							]}
 						>
 							<Text
