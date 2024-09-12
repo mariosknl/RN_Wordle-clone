@@ -21,6 +21,9 @@ import Logo from "@/assets/images/nyt-logo.svg";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
+import { LogBox } from "react-native";
+LogBox.ignoreAllLogs();
+
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 if (!publishableKey) {
@@ -76,6 +79,18 @@ export default function RootLayout() {
 												/>
 											</TouchableOpacity>
 										),
+									}}
+								/>
+								<Stack.Screen
+									name="game"
+									options={{
+										headerBackTitle: "Wordle",
+										headerTintColor: colorScheme === "dark" ? "#fff" : "#000",
+										title: "",
+										headerBackTitleStyle: {
+											fontSize: 26,
+											fontFamily: "FrankRuhlLibre_800ExtraBold",
+										},
 									}}
 								/>
 							</Stack>
