@@ -7,10 +7,17 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
+import {
+	DarkTheme,
+	DefaultTheme,
+	ThemeProvider,
+} from "@react-navigation/native";
+import { useColorScheme } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+	const colorScheme = useColorScheme();
 	const [fontsLoaded, error] = useFonts({
 		FrankRuhlLibre_500Medium,
 		FrankRuhlLibre_800ExtraBold,
@@ -28,8 +35,10 @@ export default function RootLayout() {
 	}
 
 	return (
-		<Stack>
-			<Stack.Screen name="index" options={{ headerShown: false }} />
-		</Stack>
+		<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+			<Stack>
+				<Stack.Screen name="index" options={{ headerShown: false }} />
+			</Stack>
+		</ThemeProvider>
 	);
 }
