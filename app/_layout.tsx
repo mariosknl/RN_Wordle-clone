@@ -12,7 +12,7 @@ import {
 	DefaultTheme,
 	ThemeProvider,
 } from "@react-navigation/native";
-import { TouchableOpacity, useColorScheme } from "react-native";
+import { Appearance, TouchableOpacity, useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { ClerkProvider, ClerkLoaded } from "@clerk/clerk-expo";
@@ -22,6 +22,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 
 import { LogBox } from "react-native";
+import { useMMKVBoolean } from "react-native-mmkv";
+import { storage } from "@/utils/storage";
 LogBox.ignoreAllLogs();
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
@@ -37,6 +39,11 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 	const colorScheme = useColorScheme();
 	const router = useRouter();
+	const [dark] = useMMKVBoolean("dark-mode", storage);
+
+	useEffect(() => {
+		Appearance.setColorScheme(dark ? "dark" : "light");
+	}, [dark]);
 
 	const [fontsLoaded, error] = useFonts({
 		FrankRuhlLibre_500Medium,
