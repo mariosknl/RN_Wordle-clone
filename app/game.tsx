@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -257,6 +258,29 @@ const Page = () => {
       setBorderColor(cell, curRow - 1, cellIndex);
     });
   }, [curRow]);
+
+  // WEB
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        addKey("ENTER");
+      } else if (e.key === "Backspace") {
+        addKey("BACKSPACE");
+      } else if (e.key.length === 1) {
+        addKey(e.key);
+      }
+    };
+
+    if (Platform.OS === "web") {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      if (Platform.OS === "web") {
+        document.removeEventListener("keydown", handleKeyDown);
+      }
+    };
+  }, [curCol]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
